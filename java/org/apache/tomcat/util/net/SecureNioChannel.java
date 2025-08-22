@@ -390,23 +390,25 @@ public class SecureNioChannel extends NioChannel {
                         isWritable = key.isWritable();
                 }
             }
-        } catch (IOException x) {
+        } catch (IOException ioe) {
             closeSilently();
-            throw x;
-        } catch (Exception cx) {
+            throw ioe;
+        } catch (Exception e) {
             closeSilently();
-            throw new IOException(cx);
+            throw new IOException(e);
         } finally {
             if (key != null) {
                 try {
                     key.cancel();
                 } catch (Exception ignore) {
+                    // Ignore
                 }
             }
             if (selector != null) {
                 try {
                     selector.close();
                 } catch (Exception ignore) {
+                    // Ignore
                 }
             }
         }
@@ -576,7 +578,9 @@ public class SecureNioChannel extends NioChannel {
         } catch (IOException ioe) {
             // This is expected - swallowing the exception is the reason this
             // method exists. Log at debug in case someone is interested.
-            log.debug(sm.getString("channel.nio.ssl.closeSilentError"), ioe);
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("channel.nio.ssl.closeSilentError"), ioe);
+            }
         }
     }
 

@@ -628,7 +628,9 @@ public class RemoteIpValve extends ValveBase {
                         // We know we need a DNS look up so use getCanonicalHostName()
                         request.setRemoteHost(inetAddress.getCanonicalHostName());
                     } catch (UnknownHostException e) {
-                        log.debug(sm.getString("remoteIpValve.invalidRemoteAddress", remoteIp), e);
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("remoteIpValve.invalidRemoteAddress", remoteIp), e);
+                        }
                         request.setRemoteHost(remoteIp);
                     }
                 } else {
@@ -683,7 +685,7 @@ public class RemoteIpValve extends ValveBase {
                         }
 
                     } catch (IllegalArgumentException iae) {
-                        log.debug(sm.getString("remoteIpValve.invalidHostHeader", hostHeaderValue, hostHeader));
+                        log.debug(sm.getString("remoteIpValve.invalidHostHeader", hostHeaderValue, hostHeader), iae);
                     }
                 }
             }

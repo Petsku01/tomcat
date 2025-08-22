@@ -995,7 +995,9 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             try {
                 session.close(cr);
             } catch (IOException ioe) {
-                log.debug(sm.getString("wsWebSocketContainer.sessionCloseFail", session.getId()), ioe);
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("wsWebSocketContainer.sessionCloseFail", session.getId()), ioe);
+                }
             }
         }
 
@@ -1054,7 +1056,9 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
 
     /**
-     * {@inheritDoc} The default value is 10 which means session expirations are processed every 10 seconds.
+     * {@inheritDoc}
+     * <p>
+     * The default value is 10 which means session expirations are processed every 10 seconds.
      */
     @Override
     public int getProcessPeriod() {

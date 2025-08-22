@@ -517,8 +517,8 @@ public class DeltaManager extends ClusterManagerBase {
                     counterSend_EVT_CHANGE_SESSION_ID.incrementAndGet();
                 }
                 send(msg);
-            } catch (IOException e) {
-                log.error(sm.getString("deltaManager.unableSerializeSessionID", newSessionID), e);
+            } catch (IOException ioe) {
+                log.error(sm.getString("deltaManager.unableSerializeSessionID", newSessionID), ioe);
             }
         }
     }
@@ -609,9 +609,9 @@ public class DeltaManager extends ClusterManagerBase {
         } catch (ClassNotFoundException e) {
             log.error(sm.getString("deltaManager.loading.cnfe", e), e);
             throw e;
-        } catch (IOException e) {
-            log.error(sm.getString("deltaManager.loading.ioe", e), e);
-            throw e;
+        } catch (IOException ioe) {
+            log.error(sm.getString("deltaManager.loading.ioe", ioe), ioe);
+            throw ioe;
         }
     }
 
@@ -637,9 +637,9 @@ public class DeltaManager extends ClusterManagerBase {
             }
             // Flush and close the output stream
             oos.flush();
-        } catch (IOException e) {
-            log.error(sm.getString("deltaManager.unloading.ioe", e), e);
-            throw e;
+        } catch (IOException ioe) {
+            log.error(sm.getString("deltaManager.unloading.ioe", ioe), ioe);
+            throw ioe;
         }
 
         // send object data as byte[]
@@ -788,8 +788,8 @@ public class DeltaManager extends ClusterManagerBase {
             do {
                 try {
                     Thread.sleep(100);
-                } catch (Exception sleep) {
-                    //
+                } catch (Exception ignore) {
+                    // Ignore
                 }
                 reqNow = System.currentTimeMillis();
                 isTimeout = ((reqNow - reqStart) > (1000L * getStateTransferTimeout()));
@@ -800,7 +800,7 @@ public class DeltaManager extends ClusterManagerBase {
                 do {
                     try {
                         Thread.sleep(100);
-                    } catch (Exception sleep) {
+                    } catch (Exception ignore) {
                         // Ignore
                     }
                 } while ((!getStateTransferred()) && (!isNoContextManagerReceived()));
@@ -925,8 +925,8 @@ public class DeltaManager extends ClusterManagerBase {
                 msg = new SessionMessageImpl(getName(), SessionMessage.EVT_SESSION_DELTA, session.getDiff(), sessionId,
                         sessionId + "-" + System.currentTimeMillis());
             }
-        } catch (IOException x) {
-            log.error(sm.getString("deltaManager.createMessage.unableCreateDeltaRequest", sessionId), x);
+        } catch (IOException ioe) {
+            log.error(sm.getString("deltaManager.createMessage.unableCreateDeltaRequest", sessionId), ioe);
             return null;
         }
         if (msg == null) {
@@ -1125,8 +1125,8 @@ public class DeltaManager extends ClusterManagerBase {
                     // we didn't recognize the message type, do nothing
                     break;
             } // switch
-        } catch (Exception x) {
-            log.error(sm.getString("deltaManager.receiveMessage.error", getName()), x);
+        } catch (Exception e) {
+            log.error(sm.getString("deltaManager.receiveMessage.error", getName()), e);
         } finally {
             currentThread.setContextClassLoader(contextLoader);
         }
@@ -1312,7 +1312,7 @@ public class DeltaManager extends ClusterManagerBase {
                 if (getSendAllSessionsWaitTime() > 0 && remain > 0) {
                     try {
                         Thread.sleep(getSendAllSessionsWaitTime());
-                    } catch (Exception sleep) {
+                    } catch (Exception ignore) {
                         // Ignore
                     }
                 }

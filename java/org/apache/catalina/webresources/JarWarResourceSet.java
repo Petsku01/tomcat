@@ -141,7 +141,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
                     if (jarFileIs != null) {
                         try {
                             jarFileIs.close();
-                        } catch (IOException e) {
+                        } catch (IOException ignore) {
                             // Ignore
                         }
                     }
@@ -160,7 +160,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
     /**
      * {@inheritDoc}
      * <p>
-     * JarWar needs to generate jarContents for the inner JAR, not the outer WAR.
+     * JarWar needs to generate the index (jarContents) for the inner JAR, not the outer WAR.
      */
     @Override
     protected JarFile openJarFile() throws IOException {
@@ -258,8 +258,8 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
 
         try {
             setBaseUrl(UriUtil.buildJarSafeUrl(new File(getBase())));
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
+        } catch (IOException ioe) {
+            throw new IllegalArgumentException(ioe);
         }
     }
 

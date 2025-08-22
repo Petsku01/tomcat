@@ -240,10 +240,13 @@ public abstract class AbstractReplicatedMap<K, V>
             // state is transferred, we are ready for messaging
             broadcast(MapMessage.MSG_START, true);
         } catch (ChannelException x) {
-            log.warn(sm.getString("abstractReplicatedMap.unableSend.startMessage"));
             if (terminate) {
+                // Exception is logged further up stack
+                log.warn(sm.getString("abstractReplicatedMap.unableSend.startMessage"));
                 breakdown();
                 throw new RuntimeException(sm.getString("abstractReplicatedMap.unableStart"), x);
+            } else {
+                log.warn(sm.getString("abstractReplicatedMap.unableSend.startMessage"), x);
             }
         }
         this.state = State.INITIALIZED;
@@ -371,6 +374,7 @@ public abstract class AbstractReplicatedMap<K, V>
             try {
                 broadcast(MapMessage.MSG_STOP, false);
             } catch (Exception ignore) {
+                // Ignore
             }
             // cleanup
             this.channel.removeChannelListener(this);
@@ -477,8 +481,8 @@ public abstract class AbstractReplicatedMap<K, V>
                     msg = new MapMessage(mapContextName, getReplicateMessageType(), true, (Serializable) entry.getKey(),
                             null, rentry.getDiff(), entry.getPrimary(), entry.getBackupNodes());
                     rentry.resetDiff();
-                } catch (IOException x) {
-                    log.error(sm.getString("abstractReplicatedMap.unable.diffObject"), x);
+                } catch (IOException ioe) {
+                    log.error(sm.getString("abstractReplicatedMap.unable.diffObject"), ioe);
                 } finally {
                     rentry.unlock();
                 }
@@ -713,8 +717,8 @@ public abstract class AbstractReplicatedMap<K, V>
                         diff.lock();
                         try {
                             diff.applyDiff(mapmsg.getDiffValue(), 0, mapmsg.getDiffValue().length);
-                        } catch (Exception x) {
-                            log.error(sm.getString("abstractReplicatedMap.unableApply.diff", entry.getKey()), x);
+                        } catch (Exception e) {
+                            log.error(sm.getString("abstractReplicatedMap.unableApply.diff", entry.getKey()), e);
                         } finally {
                             diff.unlock();
                         }
@@ -978,8 +982,8 @@ public abstract class AbstractReplicatedMap<K, V>
             if (this.state.isAvailable()) {
                 ping(accessTimeout);
             }
-        } catch (Exception x) {
-            log.error(sm.getString("abstractReplicatedMap.heartbeat.failed"), x);
+        } catch (Exception e) {
+            log.error(sm.getString("abstractReplicatedMap.heartbeat.failed"), e);
         }
     }
 
@@ -1522,8 +1526,8 @@ public abstract class AbstractReplicatedMap<K, V>
         public Serializable getKey() {
             try {
                 return key(null);
-            } catch (Exception x) {
-                throw new RuntimeException(sm.getString("mapMessage.deserialize.error.key"), x);
+            } catch (Exception e) {
+                throw new RuntimeException(sm.getString("mapMessage.deserialize.error.key"), e);
             }
         }
 
@@ -1546,8 +1550,8 @@ public abstract class AbstractReplicatedMap<K, V>
         public Serializable getValue() {
             try {
                 return value(null);
-            } catch (Exception x) {
-                throw new RuntimeException(sm.getString("mapMessage.deserialize.error.value"), x);
+            } catch (Exception e) {
+                throw new RuntimeException(sm.getString("mapMessage.deserialize.error.value"), e);
             }
         }
 
@@ -1593,8 +1597,8 @@ public abstract class AbstractReplicatedMap<K, V>
                     valuedata = XByteBuffer.serialize(value);
                 }
                 this.value = value;
-            } catch (IOException x) {
-                throw new RuntimeException(x);
+            } catch (IOException ioe) {
+                throw new RuntimeException(ioe);
             }
         }
 
@@ -1604,8 +1608,8 @@ public abstract class AbstractReplicatedMap<K, V>
                     keydata = XByteBuffer.serialize(key);
                 }
                 this.key = key;
-            } catch (IOException x) {
-                throw new RuntimeException(x);
+            } catch (IOException ioe) {
+                throw new RuntimeException(ioe);
             }
         }
 
